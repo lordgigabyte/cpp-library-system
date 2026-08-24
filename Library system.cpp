@@ -202,6 +202,12 @@ public:
 
 		throw std::invalid_argument("Sorry, no book with matching ISBN found \n");
 	}
+
+	const std::vector <Book>& getBooks() const {
+
+		return books;
+	}
+
 };
 
 int main() {
@@ -209,12 +215,12 @@ int main() {
 	Library library;
 
 	std::string response;
-	std::vector <std::string> valid_response = {"Loan", "Return", "Exit"};
+	std::vector <std::string> valid_response = {"Loan", "Return", "Available books", "Exit"};
 
 
 	while (true) {
 
-		std::cout << "\nHello and welcome to the library! What would you like to do?\nLoan\nReturn\nExit \n";
+		std::cout << "\nHello and welcome to the library! What would you like to do?\nLoan\nReturn\nAvailable books\nExit \n";
 		std::getline(std::cin, response);
 
 		if (std::find(valid_response.begin(), valid_response.end(), response) == valid_response.end()) {
@@ -301,6 +307,26 @@ int main() {
 
 				std::cout << ex.what() << '\n';
 				continue;
+			}
+		}
+
+		if (response == "Available books") {
+
+			for (const auto& book : library.getBooks()) {
+
+				std::string checkout;
+
+				if (book.getCheckoutStatus()) {
+
+					checkout = "Checked out";
+				}
+
+				else {
+
+					checkout = "Available";
+				}
+
+				std::cout << '\n' << book.getTitle() << ", " << book.getAuthor() << ", " << checkout << '\n';
 			}
 		}
 
