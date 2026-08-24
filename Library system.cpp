@@ -175,28 +175,28 @@ public:
 
 	}
 
-	void loanWithISBN(std::string ISBN) {
+	std::string loanWithISBN(std::string ISBN) {
 
 		for (auto& book : books) {
 
 			if (book.getISBN() == ISBN) {
 				book.checkOut();
 
-				return;
+				return book.getAuthor();
 			}
 		}
 
 		throw std::invalid_argument ("Sorry, no book with matching ISBN found \n");
 	}
 
-	void returnWithISBN(std::string ISBN) {
+	std::string returnWithISBN(std::string ISBN) {
 
 		for (auto& book : books) {
 
 			if (book.getISBN() == ISBN) {
 				book.returnBook();
 				
-				return;
+				return book.getAuthor();
 			}
 		}
 
@@ -241,7 +241,7 @@ int main() {
 			try {
 
 				library.loan(book_title);
-				std::cout << "You loaned the book: " << book_title << ", successfully! \n";
+				std::cout << "You loaned the book: " << book_title <<  ", successfully! \n";
 			}
 
 			catch (const MultipleMatchesFound& ex) {
@@ -252,8 +252,10 @@ int main() {
 
 				try {
 
-					library.loanWithISBN(ISBN_num);
-					std::cout << "You loaned the book: " << book_title << ", successfully! \n";
+					std::string correct_author = library.loanWithISBN(ISBN_num);
+
+
+					std::cout << "You loaned the book: " << book_title << " by " << correct_author << ", successfully! \n";
 				}
 
 				catch (const std::invalid_argument& ex) {
@@ -292,8 +294,8 @@ int main() {
 
 				try {
 
-					library.returnWithISBN(ISBN_num);
-					std::cout << "You returned the book: " << book_title << ", successfully! \n";
+					std::string correct_author = library.returnWithISBN(ISBN_num);
+					std::cout << "You returned the book: " << book_title << " by " << correct_author << ", successfully! \n";
 				}
 
 				catch (const std::invalid_argument& ex) {
