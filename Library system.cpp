@@ -5,6 +5,7 @@
 #include <sstream>
 #include <cctype>
 #include <stdexcept>
+#include <fstream>
 
 class MultipleMatchesFound : public std::invalid_argument {
 
@@ -124,13 +125,18 @@ private:
 public:
 
 	Library() {
+		
+		load();
 
-		books.push_back(Book{ "Harry Potter and the Philosopher's Stone", "J.K. Rowling", "9959591423341" });
-		books.push_back(Book{ "The Double", "Fyodor Dostoyevsky", "4424915358792" });
-		books.push_back(Book{ "The Double", "Jose Saramago", "7216119766575" });
-		books.push_back(Book{ "Harry Potter and the Goblet of Fire", "J.K. Rowling", "1989052027347" });
-		books.push_back(Book{ "A Tale of Two Cities", "Charles Dickens", "2932760580167" });
+		if (books.empty()) {
 
+			books.push_back(Book{ "Harry Potter and the Philosopher's Stone", "J.K. Rowling", "9959591423341" });
+			books.push_back(Book{ "The Double", "Fyodor Dostoyevsky", "4424915358792" });
+			books.push_back(Book{ "The Double", "Jose Saramago", "7216119766575" });
+			books.push_back(Book{ "Harry Potter and the Goblet of Fire", "J.K. Rowling", "1989052027347" });
+			books.push_back(Book{ "A Tale of Two Cities", "Charles Dickens", "2932760580167" });
+
+		}
 	}
 
 	void loan(std::string title) {
@@ -206,6 +212,51 @@ public:
 	const std::vector <Book>& getBooks() const {
 
 		return books;
+	}
+
+	void save() {
+
+		std::ofstream outfile("library_data.csv");
+
+		if (outfile) {
+
+			for (const auto& book : books) {
+				outfile << book.getTitle() << "," << book.getAuthor() << "," << book.getISBN() << "," << book.getCheckoutStatus() << '\n';
+			}
+
+			outfile.close();
+			std::cout << "Saved successfully!";
+			return;
+		}
+	
+		throw std::invalid_argument("File failed to open");
+	}
+
+	void load() {
+
+		std::ifstream infile("library_data.csv");
+
+		if (infile) {
+			std::string load_file;
+			std::string title, author, ISBN, status;
+			
+			while (std::getline(infile, load_file)) {
+				std::stringstream ss(load_file);
+				
+				std::getline(ss, title, ',');
+				std::getline(ss, author, ',');
+				std::getline(ss, ISBN, ',');
+				std::getline(ss, status, ',');
+
+				Book book(title, author, ISBN);
+
+				if (status == "1") {
+					book.checkOut();
+				}
+
+				books.push_back(book);
+			}
+		}
 	}
 
 };
@@ -333,6 +384,7 @@ int main() {
 		}
 
 		if (response == "Exit") {
+			library.save();
 			break;
 		}
 	}
